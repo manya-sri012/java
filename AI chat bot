@@ -1,0 +1,78 @@
+{pom.xmml}
+<dependency>
+    <groupId>edu.stanford.nlp</groupId>
+    <artifactId>stanford-corenlp</artifactId>
+    <version>4.5.4</version>
+</dependency>
+<dependency>
+    <groupId>edu.stanford.nlp</groupId>
+    <artifactId>stanford-corenlp</artifactId>
+    <version>4.5.4</version>
+    <classifier>models</classifier>
+</dependency>
+import edu.stanford.nlp.pipeline.*;
+import edu.stanford.nlp.simple.*;
+import edu.stanford.nlp.util.CoreMap;
+
+import java.util.List;
+import java.util.Scanner;
+
+public class SimpleChatbot {
+
+    private StanfordCoreNLP pipeline;
+
+    public SimpleChatbot() {
+        // Initialize the NLP pipeline
+        pipeline = new StanfordCoreNLP("StanfordCoreNLP.properties");
+    }
+
+    public String getResponse(String userInput) {
+        // Process the user input
+        Annotation document = new Annotation(userInput);
+        pipeline.annotate(document);
+        
+        // Extract entities or sentences (simple example)
+        List<CoreMap> sentences = document.get(CoreAnnotations.SentencesAnnotation.class);
+        String response;
+
+        if (sentences.size() > 0) {
+            CoreMap sentence = sentences.get(0);
+            String text = sentence.get(CoreAnnotations.TextAnnotation.class).toLowerCase();
+            
+            // Simple rule-based responses
+            if (text.contains("hello") || text.contains("hi")) {
+                response = "Hello! How can I help you today?";
+            } else if (text.contains("your name")) {
+                response = "I'm a chatbot created to assist you.";
+            } else if (text.contains("how are you")) {
+                response = "I'm just a program, but I'm doing well. How about you?";
+            } else {
+                response = "Sorry, I didn't understand that.";
+            }
+        } else {
+            response = "Sorry, I didn't get that.";
+        }
+        
+        return response;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        SimpleChatbot chatbot = new SimpleChatbot();
+
+        System.out.println("Chatbot is running. Type 'exit' to quit.");
+        while (true) {
+            System.out.print("You: ");
+            String userInput = scanner.nextLine();
+            
+            if (userInput.equalsIgnoreCase("exit")) {
+                break;
+            }
+            
+            String response = chatbot.getResponse(userInput);
+            System.out.println("Chatbot: " + response);
+        }
+
+        scanner.close();
+    }
+}
